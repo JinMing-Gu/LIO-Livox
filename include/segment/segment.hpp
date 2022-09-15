@@ -41,13 +41,13 @@ using namespace std;
 #define DN_SAMPLE_IMG_DX 0.4 //(GND_IMG_DX)
 #define DN_SAMPLE_IMG_DY 0.4 //(GND_IMG_DY)
 #define DN_SAMPLE_IMG_DZ 0.2
-#define DN_SAMPLE_IMG_OFFX 40 //(GND_IMG_OFFX)
-#define DN_SAMPLE_IMG_OFFY 40 //(GND_IMG_OFFY)
-#define DN_SAMPLE_IMG_OFFZ 2.5//2.5
+#define DN_SAMPLE_IMG_OFFX 40  //(GND_IMG_OFFX)
+#define DN_SAMPLE_IMG_OFFY 40  //(GND_IMG_OFFY)
+#define DN_SAMPLE_IMG_OFFZ 2.5 // 2.5
 
 #define FREE_ANG_NUM 360
 #define FREE_PI (3.14159265)
-#define FREE_DELTA_ANG (FREE_PI*2/FREE_ANG_NUM)
+#define FREE_DELTA_ANG (FREE_PI * 2 / FREE_ANG_NUM)
 
 typedef struct
 {
@@ -76,20 +76,19 @@ typedef struct
 
     float obb[8];
 
-    int cls;//类别
+    int cls; //类别
 
 } SClusterFeature;
 
-int FilterGndForPos(float* outPoints,float*inPoints,int inNum);
-int CalNomarls(float *nvects, float *fPoints,int pointNum,float fSearchRadius);
+int FilterGndForPos(float *outPoints, float *inPoints, int inNum);
+int CalNomarls(float *nvects, float *fPoints, int pointNum, float fSearchRadius);
 
-int CalGndPos(float *gnd, float *fPoints,int pointNum,float fSearchRadius);
+int CalGndPos(float *gnd, float *fPoints, int pointNum, float fSearchRadius);
 
 int GetNeiborPCA(SNeiborPCA &npca, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud,
-                    pcl::KdTreeFLANN<pcl::PointXYZ> kdtree, pcl::PointXYZ searchPoint, float fSearchRadius);
+                 pcl::KdTreeFLANN<pcl::PointXYZ> kdtree, pcl::PointXYZ searchPoint, float fSearchRadius);
 
-
-int CorrectPoints(float *fPoints,int pointNum,float *gndPos);
+int CorrectPoints(float *fPoints, int pointNum, float *gndPos);
 
 // 地面上物体分割
 int AbvGndSeg(int *pLabel, float *fPoints, int pointNum);
@@ -98,37 +97,36 @@ int SegBG(int *pLabel, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, pcl::KdTreeFLA
 SClusterFeature FindACluster(int *pLabel, int seedId, int labelId, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, float fSearchRadius, float thrHeight);
 int SegObjects(int *pLabel, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, float fSearchRadius);
 
-int CalFreeRegion(float *pFreeDis, float *fPoints,int *pLabel,int pointNum);
-int FreeSeg(float *fPoints,int *pLabel,int pointNum);
+int CalFreeRegion(float *pFreeDis, float *fPoints, int *pLabel, int pointNum);
+int FreeSeg(float *fPoints, int *pLabel, int pointNum);
 
 int CompleteObjects(int *pLabel, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, pcl::KdTreeFLANN<pcl::PointXYZ> &kdtree, float fSearchRadius);
-int ExpandObjects(int *pLabel, float* fPoints, int pointNum, float fSearchRadius);
-int ExpandBG(int *pLabel, float* fPoints, int pointNum, float fSearchRadius);
+int ExpandObjects(int *pLabel, float *fPoints, int pointNum, float fSearchRadius);
+int ExpandBG(int *pLabel, float *fPoints, int pointNum, float fSearchRadius);
 
 // 地面分割
-int GndSeg(int* pLabel,float *fPoints,int pointNum,float fSearchRadius);
-
+int GndSeg(int *pLabel, float *fPoints, int pointNum, float fSearchRadius);
 
 class PCSeg
 {
-    public:
+public:
     PCSeg();
     // functions
-    int DoSeg(int *pLabel, float* fPoints1, int pointNum);
-    int GetMainVectors(float*fPoints, int* pLabel, int pointNum);
+    int DoSeg(int *pLabel, float *fPoints1, int pointNum);
+    int GetMainVectors(float *fPoints, int *pLabel, int pointNum);
     int EncodeFeatures(float *pFeas);
-    int DoBoundaryDetection(float* fPoints1,int *pLabel1,int pointNum);
-    int DoTrafficLineDet(float *fPoints1,int *pLabel1,int pointNum);
+    int DoBoundaryDetection(float *fPoints1, int *pLabel1, int pointNum);
+    int DoTrafficLineDet(float *fPoints1, int *pLabel1, int pointNum);
 
-    int CorrectPoints(float *fPoints,int pointNum,float *gndPos);
+    int CorrectPoints(float *fPoints, int pointNum, float *gndPos);
 
     float *PrePoints;
     int numPrePoints = 0;
 
-    float gnd_pos[100*6];
+    float gnd_pos[100 * 6];
     int gnd_vet_len = 0;
 
-    int laneType=0;
+    int laneType = 0;
     float lanePosition[2] = {0};
 
     // vars
@@ -137,26 +135,25 @@ class PCSeg
     int posFlag;
 
     // cluster features
-    float pVectors[256*3];
-    float pCenters[256*3];//重心
+    float pVectors[256 * 3];
+    float pCenters[256 * 3]; //重心
     int pnum[256];
 
     int objClass[256];
     float zs[256];
-    float pOBBs[256*8];
+    float pOBBs[256 * 8];
 
-    float CBBox[256*7];//（a,x,y,z,l,w,h）
+    float CBBox[256 * 7]; //（a,x,y,z,l,w,h）
 
     int clusterNum;
-    
+
     float *corPoints;
     int corNum;
 
     ~PCSeg();
-
 };
 
-SClusterFeature CalBBox(float *fPoints,int pointNum);
-SClusterFeature CalOBB(float *fPoints,int pointNum);
+SClusterFeature CalBBox(float *fPoints, int pointNum);
+SClusterFeature CalOBB(float *fPoints, int pointNum);
 
 #endif

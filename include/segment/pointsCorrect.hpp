@@ -25,9 +25,9 @@ typedef struct
 } SNeiborPCA_cor;
 
 int GetNeiborPCA_cor(SNeiborPCA_cor &npca, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, pcl::KdTreeFLANN<pcl::PointXYZ> kdtree, pcl::PointXYZ searchPoint, float fSearchRadius);
-int FilterGndForPos_cor(float* outPoints,float*inPoints,int inNum);
-int CalGndPos_cor(float *gnd, float *fPoints,int pointNum,float fSearchRadius);
+int FilterGndForPos_cor(float *outPoints, float *inPoints, int inNum);
+int CalGndPos_cor(float *gnd, float *fPoints, int pointNum, float fSearchRadius);
 int GetRTMatrix_cor(float *RTM, float *v0, float *v1);
-int CorrectPoints_cor(float *fPoints,int pointNum,float *gndPos);
-int GetGndPos(float *pos, float *fPoints,int pointNum);
+int CorrectPoints_cor(float *fPoints, int pointNum, float *gndPos);
+int GetGndPos(float *pos, float *fPoints, int pointNum);
 #endif

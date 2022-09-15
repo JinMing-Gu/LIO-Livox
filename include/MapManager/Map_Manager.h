@@ -5,30 +5,41 @@
 #include <pcl/point_types.h>
 #include <pcl/filters/voxel_grid.h>
 #include <future>
-class MAP_MANAGER{
+class MAP_MANAGER
+{
     typedef pcl::PointXYZINormal PointType;
-public:
 
+public:
     std::mutex mtx_MapManager;
     /** \brief constructor of MAP_MANAGER */
-    MAP_MANAGER(const float& filter_corner, const float& filter_surf);
+    MAP_MANAGER(const float &filter_corner, const float &filter_surf);
 
     static size_t ToIndex(int i, int j, int k);
 
     /** \brief transform float to int
-  */
-    static uint32_t _float_as_int(float f){
-      union{uint32_t i; float f;} conv{};
-      conv.f = f;
-      return conv.i;
+     */
+    static uint32_t _float_as_int(float f)
+    {
+        union
+        {
+            uint32_t i;
+            float f;
+        } conv{};
+        conv.f = f;
+        return conv.i;
     }
 
     /** \brief transform int to float
-      */
-    static float _int_as_float(uint32_t i){
-      union{float f; uint32_t i;} conv{};
-      conv.i = i;
-      return conv.f;
+     */
+    static float _int_as_float(uint32_t i)
+    {
+        union
+        {
+            float f;
+            uint32_t i;
+        } conv{};
+        conv.i = i;
+        return conv.f;
     }
 
     /** \brief transform point pi to the MAP coordinate
@@ -36,70 +47,79 @@ public:
      * \param[in] po: point after transfomation
      * \param[in] _transformTobeMapped: transform matrix between pi and po
      */
-    static void pointAssociateToMap(PointType const * const pi,
-                                    PointType * const po,
-                                    const Eigen::Matrix4d& _transformTobeMapped);
+    static void pointAssociateToMap(PointType const *const pi,
+                                    PointType *const po,
+                                    const Eigen::Matrix4d &_transformTobeMapped);
 
-    void featureAssociateToMap(const pcl::PointCloud<PointType>::Ptr& laserCloudCorner,
-                               const pcl::PointCloud<PointType>::Ptr& laserCloudSurf,
-                               const pcl::PointCloud<PointType>::Ptr& laserCloudNonFeature,
-                               const pcl::PointCloud<PointType>::Ptr& laserCloudCornerToMap,
-                               const pcl::PointCloud<PointType>::Ptr& laserCloudSurfToMap,
-                               const pcl::PointCloud<PointType>::Ptr& laserCloudNonFeatureToMap,
-                               const Eigen::Matrix4d& transformTobeMapped);
+    void featureAssociateToMap(const pcl::PointCloud<PointType>::Ptr &laserCloudCorner,
+                               const pcl::PointCloud<PointType>::Ptr &laserCloudSurf,
+                               const pcl::PointCloud<PointType>::Ptr &laserCloudNonFeature,
+                               const pcl::PointCloud<PointType>::Ptr &laserCloudCornerToMap,
+                               const pcl::PointCloud<PointType>::Ptr &laserCloudSurfToMap,
+                               const pcl::PointCloud<PointType>::Ptr &laserCloudNonFeatureToMap,
+                               const Eigen::Matrix4d &transformTobeMapped);
     /** \brief add new lidar points to the map
      * \param[in] laserCloudCornerStack: coner feature points that need to be added to map
      * \param[in] laserCloudSurfStack: surf feature points that need to be added to map
      * \param[in] transformTobeMapped: transform matrix of the lidar pose
      */
-    void MapIncrement(const pcl::PointCloud<PointType>::Ptr& laserCloudCornerStack,
-                      const pcl::PointCloud<PointType>::Ptr& laserCloudSurfStack,
-                      const pcl::PointCloud<PointType>::Ptr& laserCloudNonFeatureStack,
-                      const Eigen::Matrix4d& transformTobeMapped);
+    void MapIncrement(const pcl::PointCloud<PointType>::Ptr &laserCloudCornerStack,
+                      const pcl::PointCloud<PointType>::Ptr &laserCloudSurfStack,
+                      const pcl::PointCloud<PointType>::Ptr &laserCloudNonFeatureStack,
+                      const Eigen::Matrix4d &transformTobeMapped);
 
     /** \brief retrieve map points according to the lidar pose
      * \param[in] laserCloudCornerFromMap: store coner feature points retrieved from map
      * \param[in] laserCloudSurfFromMap: tore surf feature points retrieved from map
      * \param[in] transformTobeMapped: transform matrix of the lidar pose
      */
-    void MapMove(const Eigen::Matrix4d& transformTobeMapped);
+    void MapMove(const Eigen::Matrix4d &transformTobeMapped);
 
+    size_t FindUsedCornerMap(const PointType *p, int a, int b, int c);
 
-    size_t FindUsedCornerMap(const PointType *p,int a,int b,int c);
+    size_t FindUsedSurfMap(const PointType *p, int a, int b, int c);
 
-    size_t FindUsedSurfMap(const PointType *p,int a,int b,int c);
+    size_t FindUsedNonFeatureMap(const PointType *p, int a, int b, int c);
 
-    size_t FindUsedNonFeatureMap(const PointType *p,int a,int b,int c);
-
-    pcl::KdTreeFLANN<PointType> getCornerKdMap(int i){
-      return CornerKdMap_last[i];
+    pcl::KdTreeFLANN<PointType> getCornerKdMap(int i)
+    {
+        return CornerKdMap_last[i];
     }
-    pcl::KdTreeFLANN<PointType> getSurfKdMap(int i){
-      return SurfKdMap_last[i];
+    pcl::KdTreeFLANN<PointType> getSurfKdMap(int i)
+    {
+        return SurfKdMap_last[i];
     }
-    pcl::KdTreeFLANN<PointType> getNonFeatureKdMap(int i){
-      return NonFeatureKdMap_last[i];
+    pcl::KdTreeFLANN<PointType> getNonFeatureKdMap(int i)
+    {
+        return NonFeatureKdMap_last[i];
     }
-		pcl::PointCloud<PointType>::Ptr get_corner_map(){
-			return laserCloudCornerFromMap;
-		}
-		pcl::PointCloud<PointType>::Ptr get_surf_map(){
-			return laserCloudSurfFromMap;
-		}
-    pcl::PointCloud<PointType>::Ptr get_nonfeature_map(){
-			return laserCloudNonFeatureFromMap;
-		}
-    int get_map_current_pos(){
-      return currentUpdatePos;
+    pcl::PointCloud<PointType>::Ptr get_corner_map()
+    {
+        return laserCloudCornerFromMap;
     }
-    int get_laserCloudCenWidth_last(){
-      return laserCloudCenWidth_last;
+    pcl::PointCloud<PointType>::Ptr get_surf_map()
+    {
+        return laserCloudSurfFromMap;
     }
-    int get_laserCloudCenHeight_last(){
-      return laserCloudCenHeight_last;
+    pcl::PointCloud<PointType>::Ptr get_nonfeature_map()
+    {
+        return laserCloudNonFeatureFromMap;
     }
-    int get_laserCloudCenDepth_last(){
-      return laserCloudCenDepth_last;
+    int get_map_current_pos()
+    {
+        return currentUpdatePos;
+    }
+    int get_laserCloudCenWidth_last()
+    {
+        return laserCloudCenWidth_last;
+    }
+    int get_laserCloudCenHeight_last()
+    {
+        return laserCloudCenHeight_last;
+    }
+    int get_laserCloudCenDepth_last()
+    {
+        return laserCloudCenDepth_last;
     }
     pcl::PointCloud<PointType> laserCloudSurf_for_match[4851];
     pcl::PointCloud<PointType> laserCloudCorner_for_match[4851];
@@ -117,7 +137,7 @@ private:
     static const int laserCloudWidth = 21;
     static const int laserCloudHeight = 11;
     static const int laserCloudDepth = 21;
-    static const int laserCloudNum = laserCloudWidth * laserCloudHeight * laserCloudDepth;//4851
+    static const int laserCloudNum = laserCloudWidth * laserCloudHeight * laserCloudDepth; // 4851
     pcl::PointCloud<PointType>::Ptr laserCloudCornerArray[laserCloudNum];
     pcl::PointCloud<PointType>::Ptr laserCloudSurfArray[laserCloudNum];
     pcl::PointCloud<PointType>::Ptr laserCloudNonFeatureArray[laserCloudNum];
@@ -156,4 +176,4 @@ private:
     int estimatorPos = 0;
 };
 
-#endif //LIO_LIVOX_MAP_MANAGER_H
+#endif // LIO_LIVOX_MAP_MANAGER_H
